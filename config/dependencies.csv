@@ -1,0 +1,3 @@
+1,googletest,https://github.com/google/googletest.git,release-1.10.0,true,gtest gmock gtest_main
+2,spdlog_setup,https://github.com/venkatasudha/spdlog_setup.git,master,false,spdlog_setup
+3,boost,https://github.com/boostorg/boost.git,boost-1.75.0,false,
