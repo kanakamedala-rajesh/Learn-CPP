@@ -1,0 +1,37 @@
+# level is optional for both sinks and loggers
+# level for error logging is 'err', not 'error'
+# _st => single threaded, _mt => multi threaded
+# syslog_sink is automatically thread-safe by default, no need for _mt suffix
+
+# max_size supports suffix
+# - T (terabyte)
+# - G (gigabyte)
+# - M (megabyte)
+# - K (kilobyte)
+# - or simply no suffix (byte)
+
+# check out https: // github.com/gabime/spdlog/wiki/3.-Custom-formatting
+global_pattern = "[%Y-%m-%d %T] [%L] <%n>: %v"
+
+[[sink]]
+name = "color_console_mt"
+type = "color_stdout_sink_mt"
+
+[[pattern]]
+name = "succient"
+value = "%c-%L: %v"
+
+[[logger]]
+name = "Learn-CPP"
+sinks = ["color_console_mt"]
+level = "trace"
+
+# Async
+[global_thread_pool]
+queue_size = 8192
+num_threads = 1
+
+[[thread_pool]]
+name = "tp"
+queue_size = 4096
+num_threads = 2

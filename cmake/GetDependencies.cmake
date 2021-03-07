@@ -1,16 +1,24 @@
 cmake_minimum_required(VERSION 3.17)
 set(CMAKE_CXX_STANDARD 14)
 include(FetchContent)
+include(CMakeParseArguments)
 
 #[[
 Parses provided dependencies file.
 
-dependencies_file_path           - dependencies.csv file path.
-should_include_test_dependencies - indicates if test dependencies should be included.
-includedLibraries                - output variable which includes all libraries to be linked from dependency.
+sample calls to this function:
+parse_dependencies_file(IS_TEST DEPENDENCIES_FILE "${CMAKE_CURRENT_SOURCE_DIR}/config/dependencies.csv" LIBRARIES_PARSED ${LIBRARIES_PARSED})
+                                               or
+parse_dependencies_file(DEPENDENCIES_FILE "${CMAKE_CURRENT_SOURCE_DIR}/config/dependencies.csv" LIBRARIES_PARSED ${LIBRARIES_PARSED})
+
+${LIBRARIES_PARSED} will be marked as parent scope item to be accessible from calling cmake.
 ]]
-function(parse_dependencies_file dependencies_file_path should_include_test_dependencies includedLibraries)
-    file(READ ${dependencies_file_path} dependency_file_contents)
+function(parse_dependencies_file)
+    set(options IS_TEST)
+    set(oneValueArgs DEPENDENCIES_FILE LIBRARIES_PARSED)
+    cmake_parse_arguments(PARSED_ARGS "${options}" "${oneValueArgs}" "" ${ARGN})
+
+    file(READ ${PARSED_ARGS_DEPENDENCIES_FILE} dependency_file_contents)
     string(REPLACE "\n" ";" dependencies_list ${dependency_file_contents})
 
     foreach (dependency_item ${dependencies_list})
@@ -22,20 +30,19 @@ function(parse_dependencies_file dependencies_file_path should_include_test_depe
         list(GET dependency 3 dependency_tag)
         list(GET dependency 4 dependency_is_test)
         list(GET dependency 5 libraries_to_include)
-
-        if ((${should_include_test_dependencies} STREQUAL "true") OR (${dependency_is_test} STREQUAL "false"))
+        if ((${PARSED_ARGS_IS_TEST} STREQUAL "TRUE") OR (${dependency_is_test} STREQUAL "false"))
             display_message("Including dependency ${dependency_name} in build")
             downloadRepository(${dependency_name} ${dependency_url} ${dependency_tag})
             string(REPLACE " " ";" libraries ${libraries_to_include})
             foreach (library ${libraries})
-                list(APPEND includedLibraries ${library})
+                list(APPEND PARSED_ARGS_LIBRARIES_PARSED ${library})
             endforeach ()
         else ()
             display_warning("Excluding ${dependency_name} dependency. Reason: should_include_test_dependencies: ${should_include_test_dependencies}, dependency_is_test: ${dependency_is_test}")
         endif ()
 
     endforeach ()
-    SET(${includedLibraries} PARENT_SCOPE)
+    set(LIBRARIES_PARSED ${PARSED_ARGS_LIBRARIES_PARSED} PARENT_SCOPE)
 endfunction()
 
 #[[
