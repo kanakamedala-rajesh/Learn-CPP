@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
 include(cmake/GetDependencies.cmake)
+set(CMAKE_CXX_FLAGS "-pthread")
 
 #[[ library/executable properties start ]]
 set(LIBRARY_NAME "Learn-CPP")
