@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
 include(cmake/GetDependencies.cmake)
-set(CMAKE_CXX_FLAGS "-pthread")
 
 #[[ library/executable properties start ]]
 set(LIBRARY_NAME "Learn-CPP")
@@ -26,8 +25,11 @@ endif ()
 #[[ library/executable configuration section end ]]
 
 #[[ SOURCE files section starts ]]
+set(CPP_SOURCE_FILES_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src/main/cpp")
 set(CPP_SOURCE_FILES
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/main/cpp/main.cpp")
+        "${CPP_SOURCE_FILES_PATH}/main.cpp"
+        "${CPP_SOURCE_FILES_PATH}/service/UsersDatabase.cpp"
+        )
 #[[ SOURCE files section ends ]]
 
 #[[ Libraries and Executables generation section starts ]]
@@ -45,10 +47,15 @@ foreach (target_item ${TARGETS_LIST})
     if (${target_item} MATCHES ${BINARY_NAME})
         set_target_properties(${target_item} PROPERTIES OUTPUT_NAME ${LIBRARY_NAME})
     endif ()
-    target_include_directories(${target_item} PRIVATE
+    target_include_directories(${target_item}
+            PRIVATE
             $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/config>
             $<INSTALL_INTERFACE:include>
-            PUBLIC src/main/includes)
+
+            PUBLIC
+            src/main/includes
+            src/main/includes/entities
+            src/main/includes/service)
     foreach (library ${LIBRARIES_PARSED})
         message("linking ${library} to ${target_item}")
         target_link_libraries(${target_item} ${library})

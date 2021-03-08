@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export ROOT=$PWD
-BUILD_DIRECTORY="build/"
+BUILD_DIRECTORY="cmake/build/"
 PROPERTIES_FILE="$ROOT/buildFlags.properties"
 BUILD_FLAGS=""
 
